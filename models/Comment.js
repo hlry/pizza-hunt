@@ -18,7 +18,7 @@ const ReplySchema = new Schema(
             type: Date,
             default: Date.now,
             get: createdAtVal => dateFormat(createdAtVal)
-        }
+        },
     },
     {
         toJSON: {
@@ -27,21 +27,12 @@ const ReplySchema = new Schema(
     }
 );
 
-CommentSchema.virtual('replyCount').get(function () {
-    return this.replies.length;
-});
-
-const ReplySchema = new Schema(
+const CommentSchema = new Schema(
     {
-        // set custom id to avoid confusion with parent comment _id
-        replyId: {
-            type: Schema.Types.ObjectId,
-            default: () => new Types.ObjectId()
-        },
-        replyBody: {
+        writtenBy: {
             type: String
         },
-        writtenBy: {
+        commentBody: {
             type: String
         },
         createdAt: {
@@ -49,13 +40,22 @@ const ReplySchema = new Schema(
             default: Date.now,
             get: createdAtVal => dateFormat(createdAtVal)
         },
+        // use ReplySchema to validate data for a reply
+        replies: [ReplySchema]
     },
     {
         toJSON: {
+            virtuals: true,
             getters: true
-        }
+        },
+        id: false
+
     }
 );
+
+CommentSchema.virtual('replyCount').get(function () {
+    return this.replies.length;
+});
 
 const Comment = model('Comment', CommentSchema);
 

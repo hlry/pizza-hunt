@@ -11,6 +11,21 @@ request.onupgradeneeded = function (event) {
     db.createObjectStore('new_pizza', { autoIncrement: true });
 };
 
+request.onsuccess = function (event) {
+    // when db is successfully created with its object store (from onupgradedneeded event above), save reference to db in global variable
+    db = event.target.result;
+
+    // check if app is online, if yes run checkDatabase() function to send all local db data to api
+    if (navigator.onLine) {
+        uploadPizza();
+    }
+};
+
+request.onerror = function (event) {
+    // log error here
+    console.log(event.target.errorCode);
+};
+
 // This function will be executed if we attempt to submit a new pizza and there's no internet connection
 function saveRecord(record) {
     // open a new transaction with the database with read and write permissions 
